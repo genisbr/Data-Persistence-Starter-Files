@@ -30,10 +30,6 @@ public class GameManager : MonoBehaviour
         UserName = text.text;
         SceneManager.LoadScene("main",LoadSceneMode.Single);
     }
-    public void SelfDestroy()
-    {
-        Destroy(gameObject);
-    }
     public string getUserName() { return UserName; }
      
 }

@@ -5,6 +5,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -15,7 +16,8 @@ public class MainManager : MonoBehaviour
     public Text ScoreText;
     public Text ScoreTextRanking;
     public GameObject GameOverText;
-    
+    private PlayerScore HighScore;
+    private PlayerScore SelfHighScore;
     private bool m_Started = false;
     private int m_Points;
     
@@ -26,9 +28,11 @@ public class MainManager : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(GameManager.Instance.gameObject);
-        ScoreTextRanking.text = "Best Score: " +"0 " +GameManager.Instance.getUserName() + ": 0";
+        HighScore = getHighScore();
+        if (HighScore != null )
+        ScoreTextRanking.text = "Best Score: " +HighScore.score  + " by Player " + HighScore.playerName;
 
-
+     
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
         
@@ -42,6 +46,21 @@ public class MainManager : MonoBehaviour
                 brick.PointValue = pointCountArray[i];
                 brick.onDestroyed.AddListener(AddPoint);
             }
+        }
+    }
+
+    private PlayerScore getHighScore()
+    {
+        string path = Application.persistentDataPath + "/savefile.json";
+        if (File.Exists(path))
+        {
+            string json = File.ReadAllText(path);
+            return JsonUtility.FromJson<PlayerScore>(json);
+
+        }
+        else
+        {
+            return null;
         }
     }
 
@@ -65,16 +84,36 @@ public class MainManager : MonoBehaviour
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                //GameManager.Instance.SelfDestroy();
+                
+                if (HighScore != null)
+                {
+                    if (m_Points > HighScore.score)
+                    {
+                        PlayerScore ps = new PlayerScore(GameManager.Instance.getUserName(), m_Points);
+                        setHighScore(ps);
+                    }
+                }
+                else
+                {
+                    PlayerScore ps = new PlayerScore(GameManager.Instance.getUserName(), m_Points);
+                    setHighScore(ps);
+                }
                 SceneManager.LoadScene("main",LoadSceneMode.Single);
             }
         }
     }
 
+    private void setHighScore(PlayerScore playerScore)
+    {
+        HighScore = playerScore;
+        string json = JsonUtility.ToJson(playerScore);
+        File.WriteAllText(Application.persistentDataPath + "/savefile.json", json);
+    }
+
     void AddPoint(int point)
     {
         m_Points += point;
-        ScoreText.text = $"Score : {m_Points}";
+        ScoreText.text = $"Score : {m_Points} by {GameManager.Instance.getUserName()}";
     }
 
     public void GameOver()

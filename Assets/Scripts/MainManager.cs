@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.Eventing.Reader;
+using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -24,7 +25,8 @@ public class MainManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        ScoreTextRanking.text = "Best Score: " +"0 " +GameManager.Instance.text.text + ": 0";
+        DontDestroyOnLoad(GameManager.Instance.gameObject);
+        ScoreTextRanking.text = "Best Score: " +"0 " +GameManager.Instance.getUserName() + ": 0";
 
 
         const float step = 0.6f;
@@ -60,9 +62,11 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
+
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                //GameManager.Instance.SelfDestroy();
+                SceneManager.LoadScene("main",LoadSceneMode.Single);
             }
         }
     }

@@ -10,9 +10,11 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
    
     public static GameManager Instance;
-
+    private string UserName;
     private void Awake()
     {
+
+        
         // start of new code
         if (Instance != null)
         {
@@ -20,17 +22,18 @@ public class GameManager : MonoBehaviour
             return;
         }
         // end of new code
-
         Instance = this;
         DontDestroyOnLoad(gameObject);
-    }
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    }   
     public void StartGame()
     {
-        SceneManager.LoadScene("main", LoadSceneMode.Single);
+        UserName = text.text;
+        SceneManager.LoadScene("main",LoadSceneMode.Single);
     }
+    public void SelfDestroy()
+    {
+        Destroy(gameObject);
+    }
+    public string getUserName() { return UserName; }
+     
 }
